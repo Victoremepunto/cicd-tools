@@ -24,7 +24,6 @@ export BONFIRE_NS_REQUESTER="${JOB_NAME}-${BUILD_NUMBER}"
 export BONFIRE_REPO_BRANCH="${BONFIRE_REPO_BRANCH:-main}"
 export BONFIRE_REPO_ORG="${BONFIRE_REPO_ORG:-RedHatInsights}"
 
-set -x
 # Set up docker cfg
 export DOCKER_CONFIG="$WORKSPACE/.docker"
 rm -fr $DOCKER_CONFIG
@@ -42,8 +41,6 @@ export KUBECONFIG_DIR="$WORKSPACE/.kube"
 export KUBECONFIG="$KUBECONFIG_DIR/config"
 rm -fr $KUBECONFIG_DIR
 mkdir $KUBECONFIG_DIR
-
-set +x
 
 # if this is a PR, use a different tag, since PR tags expire
 if [ ! -z "$ghprbPullId" ]; then
