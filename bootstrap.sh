@@ -57,6 +57,7 @@ export ARTIFACTS_DIR="$WORKSPACE/artifacts"
 
 rm -fr $ARTIFACTS_DIR && mkdir -p $ARTIFACTS_DIR
 
+
 # TODO: create custom jenkins agent image that has a lot of this stuff pre-installed
 export LANG=en_US.utf-8
 export LC_ALL=en_US.utf-8
