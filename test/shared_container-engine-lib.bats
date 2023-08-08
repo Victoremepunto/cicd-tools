@@ -90,3 +90,78 @@ setup() {
 
     refute container_engine_available "docker"
 }
+
+@test "if forcing docker as container engine but is emulated, keeps looking and uses podman if found" {
+
+    PREFER_CONTAINER_ENGINE="docker"
+
+    docker() {
+        podman
+    }
+    podman() {
+        echo 'podman version 1'
+    }
+    source "src/shared/container-engine-lib.sh"
+    run container_engine_cmd --version
+    assert_output --regexp "WARNING.*docker.*not present"
+    assert_output --partial "podman"
+}
+
+@test "if no container engine found, fails" {
+
+    source "src/shared/container-engine-lib.sh"
+
+    OLDPATH="$PATH"
+    PATH=':'
+    run ! container_engine_cmd --version
+    PATH="$OLDPATH"
+    assert_failure
+    assert_output --partial "ERROR, no container engine found"
+}
+
+@test "if forcing podman but not found, uses docker if found and not emulated" {
+
+    PREFER_CONTAINER_ENGINE="podman"
+
+    docker() {
+        echo 'docker version 1'
+    }
+    source "src/shared/container-engine-lib.sh"
+
+    OLDPATH="$PATH"
+    PATH=':'
+    run container_engine_cmd --version
+    PATH="$OLDPATH"
+    assert_output --regexp "WARNING.*podman.*not present"
+    assert_output --partial "podman"
+}
+
+@test "Podman is used by default if no container engine preference defined" {
+
+    podman() {
+        echo 'podman version 1'
+    }
+    docker() {
+        echo 'docker version 1'
+    }
+    source "src/shared/container-engine-lib.sh"
+
+    run container_engine_cmd --version
+    assert_output --partial "podman"
+}
+
+@test "Docker can be set as preferred over podman if both are available" {
+
+    PREFER_CONTAINER_ENGINE="docker"
+
+    podman() {
+        echo 'podman version 1'
+    }
+    docker() {
+        echo 'docker version 1'
+    }
+    source "src/shared/container-engine-lib.sh"
+
+    run container_engine_cmd --version
+    assert_output --partial "docker version 1"
+}
