@@ -18,8 +18,7 @@ get_7_chars_commit_hash() {
 }
 
 local_build() {
-    [ "$LOCAL_BUILD" = true ]
+    [[ "$LOCAL_BUILD" = true ]]
 }
-
 
 CICD_TOOLS_COMMON_LOADED=0

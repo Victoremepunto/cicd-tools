@@ -18,24 +18,20 @@ CONTAINER_ENGINE_CMD=''
 
 container_engine_cmd() {
 
-    if [ -z "$(get_container_engine_cmd)" ]; then
-        if ! set_container_engine_cmd; then
+    if [[ -z "$CONTAINER_ENGINE_CMD" ]]; then
+        if ! _set_container_engine_cmd; then
             return 1
         fi
     fi
 
-    if [ "$(get_container_engine_cmd)" = "podman" ]; then
+    if [[ "$CONTAINER_ENGINE_CMD" = "podman" ]]; then
         podman "$@"
     else
         docker "--config=${DOCKER_CONF}" "$@"
     fi
 }
 
-get_container_engine_cmd() {
-    echo -n "$CONTAINER_ENGINE_CMD"
-}
-
-set_container_engine_cmd() {
+_set_container_engine_cmd() {
 
     if _configured_container_engine_available; then
         CONTAINER_ENGINE_CMD="$PREFER_CONTAINER_ENGINE"
@@ -68,12 +64,21 @@ _configured_container_engine_available() {
     return "$CONTAINER_ENGINE_AVAILABLE"
 }
 
+_supported_container_engine() {
+
+    local CONTAINER_ENGINE_TO_CHECK="$1"
+
+    [[ ( "$CONTAINER_ENGINE_TO_CHECK" = 'docker' ) || \
+       ( "$CONTAINER_ENGINE_TO_CHECK" = 'podman' ) ]]
+}
+
 container_engine_available() {
 
     local CONTAINER_ENGINE_TO_CHECK="$1"
     local CONTAINER_ENGINE_AVAILABLE=1
 
-    if command_is_present "$CONTAINER_ENGINE_TO_CHECK"; then
+    if _supported_container_engine "$CONTAINER_ENGINE_TO_CHECK" &&\
+        command_is_present "$CONTAINER_ENGINE_TO_CHECK"; then
         if [[ "$CONTAINER_ENGINE_TO_CHECK" != "docker" ]] || ! _docker_seems_emulated; then
             CONTAINER_ENGINE_AVAILABLE=0
         fi
