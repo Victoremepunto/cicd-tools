@@ -3,10 +3,6 @@ setup() {
     _common_setup
 }
 
-teardown() {
-    : # Look Ma! No cleanup!
-}
-
 @test "Unsupported libraries fail bootstrap sequence" {
 
     run ! source bootstrap.sh unsupported-foo-library

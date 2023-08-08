@@ -165,3 +165,18 @@ setup() {
     run container_engine_cmd --version
     assert_output --partial "docker version 1"
 }
+
+@test "top level preference" {
+
+    podman() {
+        echo 'podman version 1'
+    }
+
+    docker() {
+        echo 'docker version 1'
+    }
+
+    source "$PROJECT_ROOT/src/bootstrap.sh"
+    run container_engine_cmd --version
+    # review this
+}
