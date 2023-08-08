@@ -21,6 +21,10 @@ unit test template file [here](templates/unit_test_example.sh).
 | smoke_test.sh           | **DEPRECATED**, use [cji_smoke_test.sh](cji_smoke_test.sh) |
 | iqe_pod                 | **DEPRECATED**, use [cji_smoke_test.sh](cji_smoke_test.sh) |
 
+## Bash script helper scripts usage
+
+TODO
+
 ## Template Scripts
 | Script                  | Description |  
 | ----------------------- | ----------- | 

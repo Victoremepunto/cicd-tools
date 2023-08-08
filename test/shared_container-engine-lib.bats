@@ -61,6 +61,15 @@ setup() {
     refute container_engine_available "podman"
     refute container_engine_available "docker"
     PATH="$OLDPATH"
+
+    podman() {
+        echo 'podman version 1'
+    }
+    docker() {
+        echo 'docker version 1'
+    }
+    assert container_engine_available "podman"
+    assert container_engine_available "docker"
 }
 
 @test "supported container_engine" {
@@ -72,23 +81,12 @@ setup() {
     refute _supported_container_engine ""
 }
 
-@test "testing docker" {
+@test "If docker is emulated doesn't qualifies as available" {
 
     docker() {
-        echo 'docker is mocked'
+        echo 'podman version 1'
     }
-
     source "src/shared/container-engine-lib.sh"
-    assert container_engine_available "docker"
 
-}
-
-@test "testing podman" {
-
-    podman() {
-        echo 'podman is mocked'
-    }
-
-    source "src/shared/container-engine-lib.sh"
-    assert container_engine_available "podman"
+    refute container_engine_available "docker"
 }
