@@ -9,12 +9,6 @@ CICD_TOOLS_SKIP_CLONE_REPO=${CICD_TOOLS_SKIP_CLONE_REPO}
 
 LIB_TO_LOAD=${1:-all}
 
-setup() {
-    if [ -z "$CICD_TOOLS_SKIP_CLONE_REPO" ]; then
-        _clone_cicd_tools_repo
-    fi
-}
-
 _clone_cicd_tools_repo() {
 
     if [ -d "${CICD_TOOLS_WORKDIR}" ]; then
@@ -53,6 +47,12 @@ _load_container_engine() {
 }
 
 set -e
-setup
-load_library "$LIB_TO_LOAD"
+if [ -z "$CICD_TOOLS_SKIP_CLONE_REPO" ]; then
+    if ! _clone_cicd_tools_repo; then
+        exit 1
+    fi
+fi
+if ! load_library "$LIB_TO_LOAD"; then
+    exit 1
+fi
 set +e
