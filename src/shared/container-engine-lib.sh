@@ -91,14 +91,7 @@ _podman_version_under_4_5_0() {
 }
 
 _docker_seems_emulated() {
-
-    local DOCKER_COMMAND_PATH
-    DOCKER_COMMAND_PATH=$(command -v docker)
-
-    if [[ $(file "$DOCKER_COMMAND_PATH") == *"ASCII text"* ]]; then
-        return 0
-    fi
-    return 1
+    [[ "$(docker 2>/dev/null --version)" =~ podman\ +version ]]
 }
 
 CICD_TOOLS_CONTAINER_ENGINE_LOADED=0
