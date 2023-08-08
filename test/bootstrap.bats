@@ -9,8 +9,6 @@ teardown() {
 
 @test "Unsupported libraries fail bootstrap sequence" {
 
-    bats_require_minimum_version 1.5.0
-
     run ! source bootstrap.sh unsupported-foo-library
     assert_failure 1
     assert_output --partial "Unsupported library: 'unsupported-foo-library'"
@@ -31,8 +29,6 @@ teardown() {
 }
 
 @test "loading container helper functions work successfully" {
-
-    bats_require_minimum_version 1.5.0
 
     run ! container_engine_cmd
     assert_failure 127
