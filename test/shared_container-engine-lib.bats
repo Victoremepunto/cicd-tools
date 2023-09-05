@@ -74,6 +74,8 @@ setup() {
 
 @test "supported container_engine" {
 
+    skip 'no testing private functions'
+
     source "src/shared/container-engine-lib.sh"
     assert _supported_container_engine "podman"
     assert _supported_container_engine "docker"
@@ -133,7 +135,25 @@ setup() {
     run container_engine_cmd --version
     PATH="$OLDPATH"
     assert_output --regexp "WARNING.*podman.*not present"
-    assert_output --partial "podman"
+    assert_output --partial "docker version 1"
+}
+
+@test "if forcing podman but not found and docker is emulated it fails" {
+
+    PREFER_CONTAINER_ENGINE="podman"
+
+    docker() {
+        echo 'podman version 1'
+    }
+    source "src/shared/container-engine-lib.sh"
+
+    OLDPATH="$PATH"
+    PATH=':'
+    run container_engine_cmd --version
+    PATH="$OLDPATH"
+    assert [ $status -eq 1 ]
+    assert_output --regexp "WARNING.*podman.*not present"
+    assert_output --partial "no container engine found"
 }
 
 @test "Podman is used by default if no container engine preference defined" {
@@ -147,12 +167,12 @@ setup() {
     source "src/shared/container-engine-lib.sh"
 
     run container_engine_cmd --version
-    assert_output --partial "podman"
+    assert_output --partial "podman version 1"
 }
 
 @test "Docker can be set as preferred over podman if both are available" {
 
-    PREFER_CONTAINER_ENGINE="docker"
+    PREFER_CONTAINER_ENGINE='docker'
 
     podman() {
         echo 'podman version 1'
@@ -161,8 +181,8 @@ setup() {
         echo 'docker version 1'
     }
     source "src/shared/container-engine-lib.sh"
-
     run container_engine_cmd --version
+    assert_success
     assert_output --partial "docker version 1"
 }
 
@@ -176,7 +196,8 @@ setup() {
         echo 'docker version 1'
     }
 
-    source "$PROJECT_ROOT/src/bootstrap.sh"
-    run container_engine_cmd --version
-    # review this
+    export -f podman docker
+    run bash -c "PREFER_CONTAINER_ENGINE='docker' && source src/bootstrap.sh && container_engine_cmd --version"
+    assert_success
+    assert_output --partial "docker version 1"
 }

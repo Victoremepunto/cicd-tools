@@ -3,12 +3,13 @@
 # container engine helper functions to handle both podman and docker commands
 
 CICD_TOOLS_COMMON_LOADED=${CICD_TOOLS_COMMON_LOADED:-1}
+CICD_TOOLS_CONTAINER_ENGINE_LOADED=${CICD_TOOLS_CONTAINER_ENGINE_LOADED:-1}
 
-if [ "$CICD_TOOLS_CONTAINER_ENGINE_LOADED" -eq 0 ]; then
+if [[ "$CICD_TOOLS_CONTAINER_ENGINE_LOADED" -eq 0 ]]; then
     return 0
 fi
 
-if [ "$CICD_TOOLS_COMMON_LOADED" -ne 0 ]; then
+if [[ "$CICD_TOOLS_COMMON_LOADED" -ne 0 ]]; then
     source "${CICD_TOOLS_WORKDIR}/src/shared/common.sh"
 fi
 
@@ -77,13 +78,27 @@ container_engine_available() {
     local CONTAINER_ENGINE_TO_CHECK="$1"
     local CONTAINER_ENGINE_AVAILABLE=1
 
-    if _supported_container_engine "$CONTAINER_ENGINE_TO_CHECK" &&\
-        command_is_present "$CONTAINER_ENGINE_TO_CHECK"; then
-        if [[ "$CONTAINER_ENGINE_TO_CHECK" != "docker" ]] || ! _docker_seems_emulated; then
-            CONTAINER_ENGINE_AVAILABLE=0
-        fi
+    if _container_engine_command_exists_and_is_supported "$CONTAINER_ENGINE_TO_CHECK"; then
+        CONTAINER_ENGINE_AVAILABLE=0
     fi
+
     return "$CONTAINER_ENGINE_AVAILABLE"
+}
+
+_container_engine_command_exists_and_is_supported() {
+
+    local COMMAND="$1"
+    local RESULT=0
+
+    if _supported_container_engine "$COMMAND" && command_is_present "$COMMAND"; then
+        if [[ "$COMMAND" == 'docker' ]] && _docker_seems_emulated; then
+            RESULT=1
+        fi
+    else
+        RESULT=1
+    fi
+
+    return "$RESULT"
 }
 
 _podman_version_under_4_5_0() {
