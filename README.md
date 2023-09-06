@@ -43,10 +43,11 @@ In case you want to refactor some of your scripts using this library, here's a s
 
 ```
 load_cicd_helper_functions() {
+
+  local LIBRARY_TO_LOAD=${1:-all}
+  local CICD_TOOLS_URL="https://raw.githubusercontent.com/RedHatInsights/cicd-tools/${CICD_TOOLS_REPO_BRANCH}/src/bootstrap.sh"
   set -e
-  CICD_TOOLS_REPO_BRANCH='add-container-engine-helper-tools'
-  CICD_TOOLS_REPO_ORG=Victoremepunto
-  source <(curl -sSL https://raw.githubusercontent.com/${CICD_TOOLS_REPO_ORG}/cicd-tools/${CICD_TOOLS_REPO_BRANCH}/src/bootstrap.sh)
+  source <(curl -sSL "$CICD_TOOLS_URL")
   set +e
 }
 load_cicd_helper_functions
@@ -63,6 +64,13 @@ the `CICD_TOOLS_WORKDIR` variable (defaults to `.cicd_tools` in the current dire
 
 **Please note** that the directory defined by the `CICD_TOOLS_WORKDIR` will be deleted !
 You can disable recreation feature by setting the `CICD_TOOLS_SKIP_RECREATE` variable (this is [what the tests do](test/test_helper/common-setup.bash))
+
+The bootstrap.sh can be invoked multiple times but it has a status control to ensure each
+of the libraries is loaded only once. This is to prevent potential issues with collections 
+that are not supposed to be loaded many times.
+
+An example of this is the _container_engine_ library, where the selected container engine
+is set only once the first command using the library helper function `container_engine_cmd` is used.
 
 
 ## Template Scripts
