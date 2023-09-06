@@ -125,7 +125,7 @@ setup() {
 
     run bash -c 'source "src/shared/container-engine-lib.sh" && \
         container_engine_cmd --version'
-    assert_output --regexp "WARNING.*docker.*not present"
+    assert_output --regexp "WARNING.*docker.*seems emulated"
     assert_output --partial "podman version 1"
 }
 
@@ -171,6 +171,7 @@ setup() {
     run container_engine_cmd --version
     PATH="$OLDPATH"
     assert [ $status -eq 1 ]
+    assert_output --regexp "WARNING.*docker seems emulated"
     assert_output --regexp "WARNING.*podman.*not present"
     assert_output --partial "no container engine found"
 }

@@ -62,7 +62,7 @@ _configured_container_engine_available() {
         if _container_engine_available "$PREFER_CONTAINER_ENGINE"; then
             CONTAINER_ENGINE_AVAILABLE=0
         else
-            echo "WARNING!: specified container engine '${PREFER_CONTAINER_ENGINE}' not present, finding alternative..."
+            echo "WARNING: specified container engine '${PREFER_CONTAINER_ENGINE}' not present, or isn't supported, finding alternative..."
         fi
     fi
 
@@ -96,6 +96,7 @@ _container_engine_command_exists_and_is_supported() {
 
     if _supported_container_engine "$COMMAND" && command_is_present "$COMMAND"; then
         if [[ "$COMMAND" == 'docker' ]] && _docker_seems_emulated; then
+            echo "WARNING: docker seems emulated, skipping."
             RESULT=1
         fi
     else
