@@ -44,12 +44,15 @@ In case you want to refactor some of your scripts using this library, here's a s
 ```
 load_cicd_helper_functions() {
 
-  local LIBRARY_TO_LOAD=${1:-all}
-  local CICD_TOOLS_URL="https://raw.githubusercontent.com/RedHatInsights/cicd-tools/${CICD_TOOLS_REPO_BRANCH}/src/bootstrap.sh"
-  set -e
-  source <(curl -sSL "$CICD_TOOLS_URL")
-  set +e
+    local LIBRARY_TO_LOAD=${1:-all}
+    local CICD_TOOLS_REPO_BRANCH='main'
+    local CICD_TOOLS_REPO_ORG='RedHatInsights'
+    local CICD_TOOLS_URL="https://raw.githubusercontent.com/${CICD_TOOLS_REPO_ORG}/cicd-tools/${CICD_TOOLS_REPO_BRANCH}/src/bootstrap.sh"
+    set -e
+    source <(curl -sSL "$CICD_TOOLS_URL") "$LIBRARY_TO_LOAD"
+    set +e
 }
+
 load_cicd_helper_functions
 ```
 
