@@ -29,16 +29,33 @@ Currently there is 1 collection available:
 
 - Container helper scripts: provides wrapper functions for invoking container engine agnostic commands
 
-To use any of the provided libraries, one can simply either source the [src/bootstrap.sh](bootstrap) script directly
+To use any of the provided libraries, you must source the [src/bootstrap.sh](bootstrap.sh) script.
+One can simply either source the [src/bootstrap.sh](bootstrap) script directly:
 
 ```
-source  bla bla bla
+$ source <(curl -sSL https://raw.githubusercontent.com/RedHatInsights/cicd-tools/main/src/bootstrap.sh)
+$ container_engine_cmd --version
+  podman version 4.6.1
+
 ```
 
-or use the collection it needs to load independently as a parameter:
+In case you want to refactor some of your scripts using this library, here's a snippet you can use to add:
 
 ```
-source bla bla bla collection 1
+load_cicd_helper_functions() {
+  set -e
+  CICD_TOOLS_REPO_BRANCH='add-container-engine-helper-tools'
+  CICD_TOOLS_REPO_ORG=Victoremepunto
+  source <(curl -sSL https://raw.githubusercontent.com/${CICD_TOOLS_REPO_ORG}/cicd-tools/${CICD_TOOLS_REPO_BRANCH}/src/bootstrap.sh)
+  set +e
+}
+load_cicd_helper_functions
+```
+
+you can select which collection it needs to load independently as a parameter:
+
+```
+source bootstrap.sh container_engine
 ```
 
 The bootstrap script will download the selected version of the CICD scripts (or `latest` if none specified) into the directory defined by
