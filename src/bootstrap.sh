@@ -66,6 +66,8 @@ if ! load_library "$LIB_TO_LOAD"; then
     exit 1
 fi
 
-echo "here"
-cleanup
+if [ -z "$CICD_TOOLS_SKIP_CLEANUP" ]; then
+    cleanup
+fi
+
 set +e
