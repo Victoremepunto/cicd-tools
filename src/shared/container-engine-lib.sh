@@ -36,7 +36,7 @@ container_engine_cmd() {
 
 _set_container_engine_cmd() {
 
-    if _configured_container_engine_available; then
+    if _preferred_container_engine_available; then
         CONTAINER_ENGINE_CMD="$PREFER_CONTAINER_ENGINE"
     else
         if _container_engine_available 'podman'; then
@@ -54,7 +54,7 @@ _set_container_engine_cmd() {
     fi
 }
 
-_configured_container_engine_available() {
+_preferred_container_engine_available() {
 
     local CONTAINER_ENGINE_AVAILABLE=1
 
@@ -62,7 +62,7 @@ _configured_container_engine_available() {
         if _container_engine_available "$PREFER_CONTAINER_ENGINE"; then
             CONTAINER_ENGINE_AVAILABLE=0
         else
-            echo "WARNING: specified container engine '${PREFER_CONTAINER_ENGINE}' not present, or isn't supported, finding alternative..."
+            echo "WARNING: preferred container engine '${PREFER_CONTAINER_ENGINE}' not present, or isn't supported, finding alternative..."
         fi
     fi
 
