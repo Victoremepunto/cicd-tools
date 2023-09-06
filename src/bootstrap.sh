@@ -5,12 +5,12 @@ CICD_TOOLS_REPO_BRANCH="${CICD_TOOLS_REPO_BRANCH:-main}"
 CICD_TOOLS_WORKDIR="${CICD_TOOLS_WORKDIR:-${PWD}/.cicd_tools}"
 CICD_TOOLS_COMMON_LOADED=${CICD_TOOLS_COMMON_LOADED:-1}
 CICD_TOOLS_CONTAINER_ENGINE_LOADED=${CICD_TOOLS_CONTAINER_ENGINE_LOADED:-1}
-CICD_TOOLS_SKIP_CLONE_REPO=${CICD_TOOLS_SKIP_CLONE_REPO}
+CICD_TOOLS_SKIP_RECREATE=${CICD_TOOLS_SKIP_RECREATE}
 CICD_TOOLS_DEBUG="${CICD_TOOLS_DEBUG:-}"
 
 LIB_TO_LOAD=${1:-all}
 
-_clone_cicd_tools_repo() {
+_recreate_cicd_tools_repo() {
 
     if [ -d "${CICD_TOOLS_WORKDIR}" ]; then
         echo "Removing existing CICD tools workdir: '${CICD_TOOLS_WORKDIR}'"
@@ -48,8 +48,8 @@ _load_container_engine() {
 }
 
 set -e
-if [ -z "$CICD_TOOLS_SKIP_CLONE_REPO" ]; then
-    if ! _clone_cicd_tools_repo; then
+if [ -z "$CICD_TOOLS_SKIP_RECREATE" ]; then
+    if ! _recreate_cicd_tools_repo; then
         exit 1
     fi
 fi

@@ -23,7 +23,30 @@ unit test template file [here](templates/unit_test_example.sh).
 
 ## Bash script helper scripts usage
 
-TODO
+The collection of helper scripts are expected to be loaded using the provided [src/bootstrap.sh](bootstrap) script.
+
+Currently there is 1 collection available:
+
+- Container helper scripts: provides wrapper functions for invoking container engine agnostic commands
+
+To use any of the provided libraries, one can simply either source the [src/bootstrap.sh](bootstrap) script directly
+
+```
+source  bla bla bla
+```
+
+or use the collection it needs to load independently as a parameter:
+
+```
+source bla bla bla collection 1
+```
+
+The bootstrap script will download the selected version of the CICD scripts (or `latest` if none specified) into the directory defined by
+the `CICD_TOOLS_WORKDIR` variable (defaults to `.cicd_tools` in the current directory). 
+
+**Please note** that the directory defined by the `CICD_TOOLS_WORKDIR` will be deleted !
+You can disable recreation feature by setting the `CICD_TOOLS_SKIP_RECREATE` variable (this is [what the tests do](test/test_helper/common-setup.bash))
+
 
 ## Template Scripts
 | Script                  | Description |  

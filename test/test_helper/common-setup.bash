@@ -13,7 +13,7 @@ _common_setup() {
     PATH="$PROJECT_ROOT/src:$PATH"
 
     # Required for testing current checked out project
-    export CICD_TOOLS_SKIP_CLONE_REPO='true'
+    export CICD_TOOLS_SKIP_RECREATE='true'
     export CICD_TOOLS_WORKDIR="$PROJECT_ROOT"
 }
 
