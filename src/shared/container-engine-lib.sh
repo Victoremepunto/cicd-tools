@@ -18,6 +18,7 @@ if _debug_mode; then
 fi
 
 CONTAINER_ENGINE_CMD=''
+PREFER_CONTAINER_ENGINE=${PREFER_CONTAINER_ENGINE:-}
 
 container_engine_cmd() {
 
@@ -27,11 +28,7 @@ container_engine_cmd() {
         fi
     fi
 
-    if [[ "$CONTAINER_ENGINE_CMD" = "podman" ]]; then
-        podman "$@"
-    else
-        docker "--config=${DOCKER_CONF}" "$@"
-    fi
+    "$CONTAINER_ENGINE_CMD" "$@"
 }
 
 _set_container_engine_cmd() {
