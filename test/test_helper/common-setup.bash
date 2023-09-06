@@ -15,5 +15,6 @@ _common_setup() {
     # Required for testing current checked out project
     export CICD_TOOLS_SKIP_RECREATE='true'
     export CICD_TOOLS_WORKDIR="$PROJECT_ROOT"
+    export CICD_TOOLS_SKIP_CLEANUP='true'
 }
 
