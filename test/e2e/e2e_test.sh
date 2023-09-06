@@ -2,7 +2,6 @@
 
 load_cicd_helper_functions() {
 
-    local PREFER_CONTAINER_ENGINE='docker'
     local LIBRARY_TO_LOAD=${1:-all}
     local CICD_TOOLS_REPO_BRANCH='add-container-engine-helper-tools'
     local CICD_TOOLS_REPO_ORG=Victoremepunto
@@ -21,18 +20,20 @@ docker() {
     echo "Docker version 99"
 }
 
+PREFER_CONTAINER_ENGINE='docker'
+
 load_cicd_helper_functions
 
 EXPECTED_OUTPUT=$(container_engine_cmd --version)
-
-unset PREFER_CONTAINER_ENGINE
-load_cicd_helper_functions
 
 # Assert there's an actual output
 if ! [ "Docker version 99" == "$EXPECTED_OUTPUT" ]; then
     echo "container preference not working!"
     exit 1
 fi
+
+unset PREFER_CONTAINER_ENGINE
+load_cicd_helper_functions
 
 # Assert output doesn't change 
 if ! [ "$(container_engine_cmd --version)" == "$EXPECTED_OUTPUT" ]; then

@@ -17,7 +17,7 @@ if _debug_mode; then
     echo "loading container engine"
 fi
 
-CONTAINER_ENGINE_CMD=''
+export CONTAINER_ENGINE_CMD=''
 PREFER_CONTAINER_ENGINE=${PREFER_CONTAINER_ENGINE:-}
 
 container_engine_cmd() {
