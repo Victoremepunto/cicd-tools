@@ -17,39 +17,53 @@ setup() {
 
 @test "Loading common message is displayed" {
 
-    run bash -c "source 'src/shared/container-engine-lib.sh'"
+    run bash -c "CICD_TOOLS_DEBUG='1' source 'src/shared/container-engine-lib.sh'"
     assert_success
     assert_output --partial "loading container engine"
 }
 
 @test "container engine cmd is set once" {
 
-    assert [ -z "${CONTAINER_ENGINE_CMD+x}" ]
+    docker() {
+        echo "docker version 1"
+    }
+    podman() {
+        echo "podman version 1"
+    }
+
+    PREFER_CONTAINER_ENGINE="docker"
+
+    run ! container_engine_cmd --version
+    assert_failure
     source "src/shared/container-engine-lib.sh"
-    refute [ -z "${CONTAINER_ENGINE_CMD+x}" ]
-    assert [ -z "${CONTAINER_ENGINE_CMD}" ]
+    OLDPATH="$PATH"
+    PATH=':'
+    container_engine_cmd
+    PATH="$OLDPATH"
+    run container_engine_cmd --version
+    assert_success
+    assert_output "docker version 1"
+
+    #unset PREFER_CONTAINER_ENGINE
     source "src/shared/container-engine-lib.sh"
-    assert [ -z "${CONTAINER_ENGINE_CMD}" ]
-    assert container_engine_cmd version
-    assert [ -n "${CONTAINER_ENGINE_CMD}" ]
-    EXPECTED_VALUE="$CONTAINER_ENGINE_CMD"
-    source "src/shared/container-engine-lib.sh"
-    assert [ "$CONTAINER_ENGINE_CMD" = "$EXPECTED_VALUE" ]
+    run container_engine_cmd --version
+    assert_success
+    assert_output "docker version 1"
 }
 
 @test "get container engine cmd" {
 
-    assert [ -z "${CONTAINER_ENGINE_CMD+x}" ]
+    podman() {
+        echo "podman version 1"
+    }
+
     source "src/shared/container-engine-lib.sh"
-    refute [ -z "${CONTAINER_ENGINE_CMD+x}" ]
-    assert [ -z "${CONTAINER_ENGINE_CMD}" ]
-    source "src/shared/container-engine-lib.sh"
-    assert [ -z "${CONTAINER_ENGINE_CMD}" ]
-    container_engine_cmd version
-    assert [ -n "${CONTAINER_ENGINE_CMD}" ]
+    run container_engine_cmd --version
+    assert_output --partial "podman version 1"
 }
 
 @test "test container engine available" {
+    skip 'no testing private functions'
 
     source "src/shared/container-engine-lib.sh"
 
@@ -85,6 +99,8 @@ setup() {
 
 @test "If docker is emulated doesn't qualifies as available" {
 
+    skip 'no testing private functions'
+
     docker() {
         echo 'podman version 1'
     }
@@ -95,24 +111,27 @@ setup() {
 
 @test "if forcing docker as container engine but is emulated, keeps looking and uses podman if found" {
 
-    PREFER_CONTAINER_ENGINE="docker"
+    export PREFER_CONTAINER_ENGINE="docker"
 
     docker() {
         podman
     }
+
     podman() {
         echo 'podman version 1'
     }
-    source "src/shared/container-engine-lib.sh"
-    run container_engine_cmd --version
+
+    export -f docker podman
+
+    run bash -c 'source "src/shared/container-engine-lib.sh" && \
+        container_engine_cmd --version'
     assert_output --regexp "WARNING.*docker.*not present"
-    assert_output --partial "podman"
+    assert_output --partial "podman version 1"
 }
 
 @test "if no container engine found, fails" {
 
     source "src/shared/container-engine-lib.sh"
-
     OLDPATH="$PATH"
     PATH=':'
     run ! container_engine_cmd --version

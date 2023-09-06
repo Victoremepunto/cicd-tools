@@ -16,7 +16,7 @@ setup() {
 
 @test "Loading common message is displayed" {
 
-    run bash -c "source 'src/shared/common.sh'"
+    run bash -c "CICD_TOOLS_DEBUG='1' source 'src/shared/common.sh'"
     assert_success
     assert_output "loading common"
 }

@@ -12,15 +12,17 @@ setup() {
 
 @test "Default bootstrap sequence runs successfully" {
 
-    run bash -c "source bootstrap.sh"
+    run bash -c "CICD_TOOLS_DEBUG=1 source bootstrap.sh"
     assert_success
     assert_output --partial "loading common"
+    assert_output --partial "loading container engine"
 }
 
 @test "loading all work successfully" {
 
-    run bash -c "source bootstrap.sh all"
+    run bash -c "CICD_TOOLS_DEBUG=1 source bootstrap.sh all"
     assert_success
+    assert_output --partial "loading common"
     assert_output --partial "loading container engine"
 }
 
@@ -28,6 +30,7 @@ setup() {
 
     run ! container_engine_cmd
     assert_failure 127
+    CICD_TOOLS_DEBUG=1
     source bootstrap.sh container_engine
     assert_success
     assert_output --partial "loading container engine"

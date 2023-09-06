@@ -7,7 +7,13 @@ if [ "$CICD_TOOLS_COMMON_LOADED" -eq 0 ]; then
     return 0
 fi
 
-echo "loading common"
+_debug_mode() {
+    [[ -n "$CICD_TOOLS_DEBUG" ]]
+}
+
+if _debug_mode; then
+    echo "loading common"
+fi
 
 command_is_present() {
     command -v "$1" > /dev/null 2>&1

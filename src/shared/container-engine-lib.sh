@@ -13,7 +13,9 @@ if [[ "$CICD_TOOLS_COMMON_LOADED" -ne 0 ]]; then
     source "${CICD_TOOLS_WORKDIR}/src/shared/common.sh"
 fi
 
-echo "loading container engine"
+if _debug_mode; then
+    echo "loading container engine"
+fi
 
 CONTAINER_ENGINE_CMD=''
 
@@ -37,9 +39,9 @@ _set_container_engine_cmd() {
     if _configured_container_engine_available; then
         CONTAINER_ENGINE_CMD="$PREFER_CONTAINER_ENGINE"
     else
-        if container_engine_available 'podman'; then
+        if _container_engine_available 'podman'; then
             CONTAINER_ENGINE_CMD='podman'
-        elif container_engine_available 'docker'; then
+        elif _container_engine_available 'docker'; then
             CONTAINER_ENGINE_CMD='docker'
         else
             echo "ERROR, no container engine found, please install either podman or docker first"
@@ -47,7 +49,9 @@ _set_container_engine_cmd() {
         fi
     fi
 
-    echo "Container engine selected: $CONTAINER_ENGINE_CMD"
+    if _debug_mode; then
+        echo "Container engine selected: $CONTAINER_ENGINE_CMD"
+    fi
 }
 
 _configured_container_engine_available() {
@@ -55,7 +59,7 @@ _configured_container_engine_available() {
     local CONTAINER_ENGINE_AVAILABLE=1
 
     if [ -n "$PREFER_CONTAINER_ENGINE" ]; then
-        if container_engine_available "$PREFER_CONTAINER_ENGINE"; then
+        if _container_engine_available "$PREFER_CONTAINER_ENGINE"; then
             CONTAINER_ENGINE_AVAILABLE=0
         else
             echo "WARNING!: specified container engine '${PREFER_CONTAINER_ENGINE}' not present, finding alternative..."
@@ -73,7 +77,7 @@ _supported_container_engine() {
        ( "$CONTAINER_ENGINE_TO_CHECK" = 'podman' ) ]]
 }
 
-container_engine_available() {
+_container_engine_available() {
 
     local CONTAINER_ENGINE_TO_CHECK="$1"
     local CONTAINER_ENGINE_AVAILABLE=1
