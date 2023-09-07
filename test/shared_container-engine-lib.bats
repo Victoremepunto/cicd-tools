@@ -211,5 +211,5 @@ setup() {
     run container_engine_cmd --version
     assert_success
     assert_output --regexp "WARNING.*'cat'.*isn't supported"
-    assert_output --partial "podman version 2"
+    assert_output --partial "podman version 1"
 }
