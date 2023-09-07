@@ -13,23 +13,25 @@ load_cicd_helper_functions() {
 
     local PREFER_CONTAINER_ENGINE='docker'
     local LIBRARY_TO_LOAD=${1:-all}
-    local CICD_TOOLS_REPO_BRANCH='add-container-engine-helper-tools'
-    local CICD_TOOLS_REPO_ORG=Victoremepunto
     
-    if [ "$CI" = "true" ]; then
-        if [ "$GITHUB_ACTIONS" = "true" ]; then
-            CICD_TOOLS_REPO_ORG="$GITHUB_REPOSITORY_OWNER"
-            CICD_TOOLS_REPO_BRANCH="$GITHUB_HEAD_REF"
+    if [ "CI" != "true" ]; then
+        CICD_TOOLS_ROOTDIR=.
+        CICD_TOOLS_SKIP_RECREATE=1
+        CICD_TOOLS_SKIP_CLEANUP=1
+        source src/bootstrap.sh "$LIBRARY_TO_LOAD"
+    else
+        if [ "$GITHUB_HEAD_REF" != "main" ]; then
+            CICD_TOOLS_ROOTDIR=.
+            source src/bootstrap.sh "$LIBRARY_TO_LOAD"
+        else
+            source <(curl -sSL "$CICD_TOOLS_URL") "$LIBRARY_TO_LOAD"
         fi
     fi
-
-    local CICD_TOOLS_URL="https://raw.githubusercontent.com/${CICD_TOOLS_REPO_ORG}/cicd-tools/${CICD_TOOLS_REPO_BRANCH}/src/bootstrap.sh"
-
-    source <(curl -sSL "$CICD_TOOLS_URL") "$LIBRARY_TO_LOAD"
 
     # required to persist container preferrence
     container_engine_cmd --version
 }
+
 load_cicd_helper_functions container_engine
 
 EXPECTED_OUTPUT=$(container_engine_cmd --version)
