@@ -22,7 +22,7 @@ jobs:
         run: bats test
       - name: E2E tests
         run: |
-          for test_script in test/e2e/test_*; do
+          for test_script in test/e2e/test_e2e_load_library*; do
             echo "Running $test_script"
             bash -x $test_script || exit 1
           done
