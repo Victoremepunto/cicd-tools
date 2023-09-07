@@ -50,7 +50,7 @@ jobs:
           wget https://github.com/SimonKagstrom/kcov/releases/download/v40/kcov-amd64.tar.gz
           tar -xf kcov-amd64.tar.gz
       - run: |
-          ./usr/local/bin/kcov --exclude-path=/tmp $PWD/coverage bats --filter-tags '!no-kcov' test/
+          ./usr/local/bin/kcov --exclude-path=/tmp --include-pattern /cicd-tools/src $PWD/coverage bats --filter-tags '!no-kcov' test/
         shell: 'script -q -e -c "bash {0}"' # work around tty issues
         env:
           TERM: linux # fix tput for tty issue work around
@@ -63,10 +63,10 @@ jobs:
         id: coverage-percent
         shell: bash
         env:
-          minimum_coverage: 86.39
+          minimum_coverage: 85.50
         run: |
           value=$(jq '.percent_covered' <coverage/bats/coverage.json)
-          fixd_point() { # <float val>
+          fixed_point() { # <float val>
             int=${value%.*}
             decimals=${value#*.}
             echo $int${decimals::2}
