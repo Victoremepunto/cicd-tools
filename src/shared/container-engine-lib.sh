@@ -66,14 +66,6 @@ _preferred_container_engine_available() {
     return "$CONTAINER_ENGINE_AVAILABLE"
 }
 
-_supported_container_engine() {
-
-    local CONTAINER_ENGINE_TO_CHECK="$1"
-
-    [[ ( "$CONTAINER_ENGINE_TO_CHECK" = 'docker' ) || \
-       ( "$CONTAINER_ENGINE_TO_CHECK" = 'podman' ) ]]
-}
-
 _container_engine_available() {
 
     local CONTAINER_ENGINE_TO_CHECK="$1"
@@ -103,12 +95,20 @@ _container_engine_command_exists_and_is_supported() {
     return "$RESULT"
 }
 
-_podman_version_under_4_5_0() {
-    [ "$(echo -en "4.5.0\n$(_podman_version)" | sort -V | head -1)" != "4.5.0" ]
+_supported_container_engine() {
+
+    local CONTAINER_ENGINE_TO_CHECK="$1"
+
+    [[ ( "$CONTAINER_ENGINE_TO_CHECK" = 'docker' ) || \
+       ( "$CONTAINER_ENGINE_TO_CHECK" = 'podman' ) ]]
 }
 
 _docker_seems_emulated() {
     [[ "$(docker 2>/dev/null --version)" =~ podman\ +version ]]
+}
+
+_podman_version_under_4_5_0() {
+    [ "$(echo -en "4.5.0\n$(_podman_version)" | sort -V | head -1)" != "4.5.0" ]
 }
 
 CICD_TOOLS_CONTAINER_ENGINE_LOADED=0
