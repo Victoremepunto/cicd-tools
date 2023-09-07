@@ -17,7 +17,8 @@ jobs:
       - name: E2E tests
         run: |
           for test_script in test/e2e/test_*; do
-            $test_script || exit 1
+            echo "Running $test_script"
+            bash -x $test_script || exit 1
           done
   shellcheck:
     runs-on: ubuntu-latest
