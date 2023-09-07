@@ -32,6 +32,8 @@ if [ -z "$CICD_TOOLS_SKIP_RECREATE" ]; then
         exit 1
     fi
 fi
+
+# shellcheck source=src/main.sh
 source "$CICD_TOOLS_SCRIPTS_DIR/main.sh" "$@" || exit 1
 if [ -z "$CICD_TOOLS_SKIP_CLEANUP" ]; then
     if ! cleanup; then

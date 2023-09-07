@@ -15,6 +15,7 @@ if [ -z "$CICD_TOOLS_SCRIPTS_DIR" ]; then
 fi
 
 if [[ "$CICD_TOOLS_COMMON_LOADED" -ne 0 ]]; then
+    # shellcheck source=src/shared/common.sh
     source "${CICD_TOOLS_SCRIPTS_DIR}/shared/common.sh"
 fi
 

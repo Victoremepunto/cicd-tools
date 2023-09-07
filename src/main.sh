@@ -18,7 +18,7 @@ load_library() {
         container_engine)
             _load_container_engine
             ;;
-        *) echo "Unsupported library: '"$LIB_TO_LOAD"'"
+        *) echo "Unsupported library: '$LIB_TO_LOAD'"
             return 1
 
     esac
@@ -29,7 +29,9 @@ _load_all() {
 }
 
 _load_container_engine() {
+    # shellcheck source=src/shared/common.sh
     source "${CICD_TOOLS_SCRIPTS_DIR}/shared/common.sh"
+    # shellcheck source=src/shared/container-engine-lib.sh
     source "${CICD_TOOLS_SCRIPTS_DIR}/shared/container-engine-lib.sh"
 }
 
