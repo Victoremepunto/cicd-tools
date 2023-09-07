@@ -15,7 +15,7 @@ jobs:
       - name: BATS tests
         run: bats test
       - name: E2E tests
-      - run: |
+        run: |
           for test_script in test/e2e/test_*; do
             $test_script || exit 1
           done
