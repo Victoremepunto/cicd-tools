@@ -100,53 +100,6 @@ setup() {
     assert_output --partial "podman version 1"
 }
 
-@test "test container engine available" {
-    skip 'no testing private functions'
-
-    source "src/shared/container-engine-lib.sh"
-
-    refute container_engine_available "foo"
-    refute container_engine_available "cat"
-
-    OLDPATH="$PATH"
-    PATH=':'
-    refute container_engine_available "podman"
-    refute container_engine_available "docker"
-    PATH="$OLDPATH"
-
-    podman() {
-        echo 'podman version 1'
-    }
-    docker() {
-        echo 'docker version 1'
-    }
-    assert container_engine_available "podman"
-    assert container_engine_available "docker"
-}
-
-@test "supported container_engine" {
-
-    skip 'no testing private functions'
-
-    source "src/shared/container-engine-lib.sh"
-    assert _supported_container_engine "podman"
-    assert _supported_container_engine "docker"
-    refute _supported_container_engine "fooobar"
-    refute _supported_container_engine ""
-}
-
-@test "If docker is emulated doesn't qualifies as available" {
-
-    skip 'no testing private functions'
-
-    docker() {
-        echo 'podman version 1'
-    }
-    source "src/shared/container-engine-lib.sh"
-
-    refute container_engine_available "docker"
-}
-
 @test "if forcing docker as container engine but is emulated, keeps looking and uses podman if found" {
 
     PREFER_CONTAINER_ENGINE="docker"
@@ -241,4 +194,22 @@ setup() {
     run container_engine_cmd --version
     assert_success
     assert_output --partial "docker version 1"
+}
+
+@test "cat is not a supported container engine" {
+
+    PREFER_CONTAINER_ENGINE='cat'
+
+
+    cat() {
+        echo "not an awesome container engine"
+    }
+    podman() {
+        echo 'podman version 1'
+    }
+    source main.sh container_engine
+    run container_engine_cmd --version
+    assert_success
+    assert_output --regexp "WARNING.*'cat'.*isn't supported"
+    assert_output --partial "podman version 2"
 }

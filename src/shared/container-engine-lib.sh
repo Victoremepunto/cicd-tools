@@ -104,8 +104,8 @@ _supported_container_engine() {
 
     local CONTAINER_ENGINE_TO_CHECK="$1"
 
-    [[ ( "$CONTAINER_ENGINE_TO_CHECK" = 'docker' ) || \
-       ( "$CONTAINER_ENGINE_TO_CHECK" = 'podman' ) ]]
+    [ "$CONTAINER_ENGINE_TO_CHECK" = 'docker' ] || \
+        [ "$CONTAINER_ENGINE_TO_CHECK" = 'podman' ]
 }
 
 _docker_seems_emulated() {

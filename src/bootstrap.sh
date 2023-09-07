@@ -4,7 +4,7 @@ CICD_TOOLS_REPO_ORG="${CICD_TOOLS_REPO_ORG:-RedHatInsights}"
 CICD_TOOLS_REPO_BRANCH="${CICD_TOOLS_REPO_BRANCH:-main}"
 CICD_TOOLS_ROOTDIR="${CICD_TOOLS_ROOTDIR:-.cicd_tools}"
 CICD_TOOLS_SCRIPTS_DIR="${CICD_TOOLS_ROOTDIR}/src"
-CICD_TOOLS_SKIP_CLEANUP=${CICD_TOOLS_SKIP_CLEANUP}
+CICD_TOOLS_SKIP_CLEANUP=${CICD_TOOLS_SKIP_CLEANUP:-}
 
 recreate_cicd_tools_repo() {
 
@@ -32,7 +32,7 @@ if [ -z "$CICD_TOOLS_SKIP_RECREATE" ]; then
         exit 1
     fi
 fi
-source "$CICD_TOOLS_ROOTDIR/src/main.sh" "$@" || exit 1
+source "$CICD_TOOLS_SCRIPTS_DIR/main.sh" "$@" || exit 1
 if [ -z "$CICD_TOOLS_SKIP_CLEANUP" ]; then
     if ! cleanup; then
         echo "couldn't perform cicd tools cleanup!"
