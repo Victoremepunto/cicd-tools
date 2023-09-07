@@ -16,8 +16,7 @@ load_cicd_helper_functions() {
     local CICD_TOOLS_REPO_BRANCH='add-container-engine-helper-tools'
     local CICD_TOOLS_REPO_ORG=Victoremepunto
     
-
-    if [ $CI = "true" ]; then
+    if [ "$CI" = "true" ]; then
         if [ "$GITHUB_ACTIONS" = "true" ]; then
             CICD_TOOLS_REPO_ORG="$GITHUB_REPOSITORY_OWNER"
             CICD_TOOLS_REPO_BRANCH="$GITHUB_HEAD_REF"
