@@ -4,6 +4,13 @@ setup() {
     _common_setup
 }
 
+@test "Common can be sourced directly" {
+
+    run source "src/shared/common.sh"
+    assert_success
+}
+
+
 @test "Sets expected loaded flags" {
 
     assert [ -z "$CICD_TOOLS_COMMON_LOADED" ]
@@ -16,12 +23,17 @@ setup() {
 
 @test "Loading common message is displayed" {
 
-    run bash -c "CICD_TOOLS_DEBUG='1' source 'src/shared/common.sh'"
+    CICD_TOOLS_DEBUG=1
+    run source 'src/shared/common.sh'
     assert_success
     assert_output "loading common"
 }
 
 @test "command is present works" {
+
+    cat() {
+        echo "cat exists"
+    }
 
     source "src/shared/common.sh"
     run ! command_is_present foo
@@ -29,6 +41,7 @@ setup() {
 
     run command_is_present cat
     assert_success
+    assert_output ""
 }
 
 @test "get_7_chars_commit_hash works" {

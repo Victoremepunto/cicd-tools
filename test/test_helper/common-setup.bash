@@ -11,10 +11,5 @@ _common_setup() {
     PROJECT_ROOT="$( cd "$( dirname "$BATS_TEST_FILENAME" )/.." >/dev/null 2>&1 && pwd )"
     # make executables in src/ visible to PATH
     PATH="$PROJECT_ROOT/src:$PATH"
-
-    # Required for testing current checked out project
-    export CICD_TOOLS_SKIP_RECREATE='true'
-    export CICD_TOOLS_WORKDIR="$PROJECT_ROOT"
-    export CICD_TOOLS_SKIP_CLEANUP='true'
 }
 

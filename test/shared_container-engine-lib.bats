@@ -4,20 +4,28 @@ setup() {
     _common_setup
 }
 
+@test "Load directly results in error" {
+
+    run ! source "src/shared/container-engine-lib.sh"
+    assert_failure
+    assert_output --partial "load through main.sh"
+}
+
 @test "Sets expected loaded flags" {
 
     assert [ -z "$CICD_TOOLS_COMMON_LOADED" ]
     assert [ -z "$CICD_TOOLS_CONTAINER_ENGINE_LOADED" ]
 
-    source "src/shared/container-engine-lib.sh"
+    source main.sh container_engine
 
-    assert [ "$CICD_TOOLS_COMMON_LOADED" -eq 0 ]
-    assert [ "$CICD_TOOLS_CONTAINER_ENGINE_LOADED" -eq 0 ]
+    assert [ -n "$CICD_TOOLS_COMMON_LOADED" ]
+    assert [ -n "$CICD_TOOLS_CONTAINER_ENGINE_LOADED" ]
 }
 
 @test "Loading common message is displayed" {
 
-    run bash -c "CICD_TOOLS_DEBUG='1' source 'src/shared/container-engine-lib.sh'"
+    CICD_TOOLS_DEBUG=1
+    run source main.sh container_engine
     assert_success
     assert_output --partial "loading container engine"
 }
@@ -33,22 +41,52 @@ setup() {
 
     PREFER_CONTAINER_ENGINE="docker"
 
-    run ! container_engine_cmd --version
+    run ! container_engine_cmd
     assert_failure
-    source "src/shared/container-engine-lib.sh"
-    OLDPATH="$PATH"
-    PATH=':'
-    container_engine_cmd
-    PATH="$OLDPATH"
+    assert_output --partial "container_engine_cmd: command not found"
+
+    source src/main.sh container_engine
+
+    container_engine_cmd --version
     run container_engine_cmd --version
-    assert_success
+
+    assert_success 
     assert_output "docker version 1"
 
-    #unset PREFER_CONTAINER_ENGINE
-    source "src/shared/container-engine-lib.sh"
+    unset PREFER_CONTAINER_ENGINE
+    source main.sh container_engine
     run container_engine_cmd --version
-    assert_success
+    assert_success 
     assert_output "docker version 1"
+}
+
+@test "container engine cmd is set once - setting preference after initial call" {
+
+    docker() {
+        echo "docker version 1"
+    }
+    podman() {
+        echo "podman version 1"
+    }
+
+    run ! container_engine_cmd
+    assert_failure
+    assert_output --partial "container_engine_cmd: command not found"
+
+    source src/main.sh container_engine
+
+    container_engine_cmd --version
+
+    PREFER_CONTAINER_ENGINE="docker"
+
+    run container_engine_cmd --version
+    assert_success 
+    assert_output "podman version 1"
+
+    source main.sh container_engine
+    run container_engine_cmd --version
+    assert_success 
+    assert_output "podman version 1"
 }
 
 @test "get container engine cmd" {
@@ -57,7 +95,7 @@ setup() {
         echo "podman version 1"
     }
 
-    source "src/shared/container-engine-lib.sh"
+    source main.sh container_engine
     run container_engine_cmd --version
     assert_output --partial "podman version 1"
 }
@@ -111,7 +149,7 @@ setup() {
 
 @test "if forcing docker as container engine but is emulated, keeps looking and uses podman if found" {
 
-    export PREFER_CONTAINER_ENGINE="docker"
+    PREFER_CONTAINER_ENGINE="docker"
 
     docker() {
         podman
@@ -121,17 +159,15 @@ setup() {
         echo 'podman version 1'
     }
 
-    export -f docker podman
-
-    run bash -c 'source "src/shared/container-engine-lib.sh" && \
-        container_engine_cmd --version'
+    source main.sh container_engine
+    run container_engine_cmd --version
     assert_output --regexp "WARNING.*docker.*seems emulated"
     assert_output --partial "podman version 1"
 }
 
 @test "if no container engine found, fails" {
 
-    source "src/shared/container-engine-lib.sh"
+    source main.sh container_engine
     OLDPATH="$PATH"
     PATH=':'
     run ! container_engine_cmd --version
@@ -147,7 +183,7 @@ setup() {
     docker() {
         echo 'docker version 1'
     }
-    source "src/shared/container-engine-lib.sh"
+    source main.sh container_engine
 
     OLDPATH="$PATH"
     PATH=':'
@@ -164,7 +200,7 @@ setup() {
     docker() {
         echo 'podman version 1'
     }
-    source "src/shared/container-engine-lib.sh"
+    source main.sh container_engine
 
     OLDPATH="$PATH"
     PATH=':'
@@ -184,9 +220,10 @@ setup() {
     docker() {
         echo 'docker version 1'
     }
-    source "src/shared/container-engine-lib.sh"
+    source main.sh container_engine
 
     run container_engine_cmd --version
+    assert_success
     assert_output --partial "podman version 1"
 }
 
@@ -200,24 +237,8 @@ setup() {
     docker() {
         echo 'docker version 1'
     }
-    source "src/shared/container-engine-lib.sh"
+    source main.sh container_engine
     run container_engine_cmd --version
-    assert_success
-    assert_output --partial "docker version 1"
-}
-
-@test "top level preference" {
-
-    podman() {
-        echo 'podman version 1'
-    }
-
-    docker() {
-        echo 'docker version 1'
-    }
-
-    export -f podman docker
-    run bash -c "PREFER_CONTAINER_ENGINE='docker' && source src/bootstrap.sh && container_engine_cmd --version"
     assert_success
     assert_output --partial "docker version 1"
 }

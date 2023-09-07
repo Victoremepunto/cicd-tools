@@ -9,15 +9,20 @@ if [[ "$CICD_TOOLS_CONTAINER_ENGINE_LOADED" -eq 0 ]]; then
     return 0
 fi
 
+if [ -z "$CICD_TOOLS_SCRIPTS_DIR" ]; then
+    echo "scripts directory not defined, please load through main.sh script"
+    return 1
+fi
+
 if [[ "$CICD_TOOLS_COMMON_LOADED" -ne 0 ]]; then
-    source "${CICD_TOOLS_WORKDIR}/src/shared/common.sh"
+    source "${CICD_TOOLS_SCRIPTS_DIR}/shared/common.sh"
 fi
 
 if _debug_mode; then
     echo "loading container engine"
 fi
 
-export CONTAINER_ENGINE_CMD=''
+CONTAINER_ENGINE_CMD=''
 PREFER_CONTAINER_ENGINE=${PREFER_CONTAINER_ENGINE:-}
 
 container_engine_cmd() {

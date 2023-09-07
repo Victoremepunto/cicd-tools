@@ -3,16 +3,17 @@ setup() {
     _common_setup
 }
 
-@test "Unsupported libraries fail bootstrap sequence" {
+@test "Unsupported libraries fail to load" {
 
-    run ! source bootstrap.sh unsupported-foo-library
+    run ! source main.sh unsupported-foo-library
     assert_failure 1
     assert_output --partial "Unsupported library: 'unsupported-foo-library'"
 }
 
-@test "Default bootstrap sequence runs successfully" {
+@test "Default main loading sequence runs successfully" {
 
-    run bash -c "CICD_TOOLS_DEBUG=1 source bootstrap.sh"
+    CICD_TOOLS_DEBUG=1
+    run source src/main.sh ''
     assert_success
     assert_output --partial "loading common"
     assert_output --partial "loading container engine"
@@ -20,7 +21,8 @@ setup() {
 
 @test "loading all work successfully" {
 
-    run bash -c "CICD_TOOLS_DEBUG=1 source bootstrap.sh all"
+    CICD_TOOLS_DEBUG=1
+    run source main.sh all
     assert_success
     assert_output --partial "loading common"
     assert_output --partial "loading container engine"
@@ -28,26 +30,31 @@ setup() {
 
 @test "loading container helper functions work successfully" {
 
+    podman() {
+        echo "podman here"
+    }
     run ! container_engine_cmd
-    assert_failure 127
+    assert_failure
     CICD_TOOLS_DEBUG=1
-    source bootstrap.sh container_engine
+    run source main.sh container_engine
     assert_success
     assert_output --partial "loading container engine"
-    source bootstrap.sh container_engine
-    container_engine_cmd
+    source main.sh container_engine
+    run container_engine_cmd
     assert_success
+    assert_output --partial "podman here"
 }
 
-@test "Loading multiple bootstraps don't reload multiple times" {
+@test "Loading multiple times don't reload libraries multiple times" {
 
     assert [ -z "$CICD_TOOLS_COMMON_LOADED" ]
-    source bootstrap.sh
+    source main.sh
     assert [ "$CICD_TOOLS_COMMON_LOADED" -eq 0 ]
-    run bash -c "source bootstrap.sh"
+    CICD_TOOLS_DEBUG=1
+    run source main.sh ""
     refute_output --partial "loading common"
-    run bash -c "source bootstrap.sh all"
+    run source main.sh all
     refute_output --partial "loading common"
-    run bash -c "source bootstrap.sh container_engine"
+    run source main.sh container_engine
     refute_output --partial "loading container engine"
 }
