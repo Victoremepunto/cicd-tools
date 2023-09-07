@@ -2,7 +2,7 @@ name: Run tests
 run-name: Run tests
 on: [pull_request]
 jobs:
-  run-bats:
+  run-tests:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -12,7 +12,13 @@ jobs:
         with:
           node-version: '14'
       - run: npm install -g bats
-      - run: bats test
+      - name: BATS tests
+        run: bats test
+      - name: E2E tests
+      - run: |
+        for test_script in test/e2e/test_*; do
+            $test_script || exit 1
+        done
   shellcheck:
     runs-on: ubuntu-latest
     steps:

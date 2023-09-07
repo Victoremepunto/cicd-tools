@@ -39,7 +39,7 @@ $ container_engine_cmd --version
 
 ```
 
-In case you want to refactor some of your scripts using this library, here's a snippet you can use to add:
+In case you want to refactor some of your scripts using this library, here's a snippet you can use:
 
 ```
 load_cicd_helper_functions() {
@@ -56,7 +56,7 @@ load_cicd_helper_functions() {
 load_cicd_helper_functions
 ```
 
-you can select which collection it needs to load independently as a parameter:
+you can select which collection needs to load independently as a parameter:
 
 ```
 source bootstrap.sh container_engine
@@ -66,14 +66,14 @@ The bootstrap script will download the selected version of the CICD scripts (or 
 the `CICD_TOOLS_WORKDIR` variable (defaults to `.cicd_tools` in the current directory). 
 
 **Please note** that the directory defined by the `CICD_TOOLS_WORKDIR` will be deleted !
-You can disable recreation feature by setting the `CICD_TOOLS_SKIP_RECREATE` variable (this is [what the tests do](test/test_helper/common-setup.bash))
+You can disable recreation feature by setting the `CICD_TOOLS_SKIP_RECREATE` variable
 
 The bootstrap.sh can be invoked multiple times but it has a status control to ensure each
 of the libraries is loaded only once. This is to prevent potential issues with collections 
 that are not supposed to be loaded many times.
 
 An example of this is the _container_engine_ library, where the selected container engine
-is set only once the first command using the library helper function `container_engine_cmd` is used.
+is **set only once the first command using the library helper function `container_engine_cmd` is used**.
 
 
 ## Template Scripts

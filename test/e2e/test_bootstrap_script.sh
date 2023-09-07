@@ -30,7 +30,7 @@ load_cicd_helper_functions() {
     # required to persist container preferrence
     container_engine_cmd --version
 }
-load_cicd_helper_functions
+load_cicd_helper_functions container_engine
 
 EXPECTED_OUTPUT=$(container_engine_cmd --version)
 
@@ -43,6 +43,11 @@ fi
 load_cicd_helper_functions
 
 # Assert output doesn't change 
+if ! [ "$(container_engine_cmd --version)" == "$EXPECTED_OUTPUT" ]; then
+    echo "Container command not preserved between runs!"
+    exit 1
+fi
+
 if ! [ "$(container_engine_cmd --version)" == "$EXPECTED_OUTPUT" ]; then
     echo "Container command not preserved between runs!"
     exit 1
