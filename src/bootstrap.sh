@@ -11,7 +11,7 @@ CICD_TOOLS_DEBUG="${CICD_TOOLS_DEBUG:-}"
 
 LIB_TO_LOAD=${1:-all}
 
-_recreate_cicd_tools_repo() {
+recreate_cicd_tools_repo() {
 
     if [ -d "${CICD_TOOLS_WORKDIR}" ]; then
         _delete_cicd_tools_workdir
@@ -21,6 +21,12 @@ _recreate_cicd_tools_repo() {
         --branch "$CICD_TOOLS_REPO_BRANCH" \
         "https://github.com/${CICD_TOOLS_REPO_ORG}/cicd-tools.git" "$CICD_TOOLS_WORKDIR"
 }
+
+_delete_cicd_tools_workdir() {
+    echo "Removing existing CICD tools workdir: '${CICD_TOOLS_WORKDIR}'"
+    rm -rf "${CICD_TOOLS_WORKDIR}"
+}
+
 
 load_library() {
 
@@ -47,18 +53,13 @@ _load_container_engine() {
     source "${CICD_TOOLS_WORKDIR}/src/shared/container-engine-lib.sh"
 }
 
-_delete_cicd_tools_workdir() {
-    echo "Removing existing CICD tools workdir: '${CICD_TOOLS_WORKDIR}'"
-    rm -rf "${CICD_TOOLS_WORKDIR}"
-}
-
 cleanup() {
     _delete_cicd_tools_workdir
 }
 
 set -e
 if [ -z "$CICD_TOOLS_SKIP_RECREATE" ]; then
-    if ! _recreate_cicd_tools_repo; then
+    if ! recreate_cicd_tools_repo; then
         exit 1
     fi
 fi
@@ -69,5 +70,4 @@ fi
 if [ -z "$CICD_TOOLS_SKIP_CLEANUP" ]; then
     cleanup
 fi
-
 set +e
