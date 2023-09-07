@@ -26,10 +26,11 @@ load_cicd_helper_functions() {
     local CICD_TOOLS_URL="https://raw.githubusercontent.com/${CICD_TOOLS_REPO_ORG}/cicd-tools/${CICD_TOOLS_REPO_BRANCH}/src/bootstrap.sh"
 
     source <(curl -sSL "$CICD_TOOLS_URL") "$LIBRARY_TO_LOAD"
+
+    # required to persist container preferrence
+    container_engine_cmd --version
 }
 load_cicd_helper_functions
-
-container_engine_cmd
 
 EXPECTED_OUTPUT=$(container_engine_cmd --version)
 
