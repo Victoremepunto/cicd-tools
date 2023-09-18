@@ -67,10 +67,11 @@ jobs:
         # TODO: this is a bit broken - fix and submit PR upstream
         run: |
           value=$(jq '.percent_covered' <coverage/bats/coverage.json)
+          expected="$minimum_coverage"
           fixed_point() { # <float val>
             int=${value%.*}
             decimals=${value#*.}
-            echo $int${decimals::2}
+            echo -n "${int}${decimals}"
           }
           echo "Coverage: $value%" | tee "$GITHUB_STEP_SUMMARY"
           if (( $(fixed_point $value) < $(fixed_point $expected) )); then
