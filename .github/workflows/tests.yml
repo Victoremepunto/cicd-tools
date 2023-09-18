@@ -49,11 +49,10 @@ jobs:
       - run: |
           wget https://github.com/SimonKagstrom/kcov/releases/download/v40/kcov-amd64.tar.gz
           tar -xf kcov-amd64.tar.gz
-      - run: |
-          ./usr/local/bin/kcov --exclude-path=/tmp --include-pattern /cicd-tools/src $PWD/coverage bats --filter-tags '!no-kcov' test/
-        shell: 'script -q -e -c "bash {0}"' # work around tty issues
-        env:
-          TERM: linux # fix tput for tty issue work around
+      - run: ./test/generate_coverage.sh
+#        shell: 'script -q -e -c "bash {0}"' # work around tty issues
+#        env:
+#          TERM: linux # fix tput for tty issue work around
       - name: Archive code coverage results
         uses: actions/upload-artifact@v3
         with:
@@ -64,17 +63,4 @@ jobs:
         shell: bash
         env:
           minimum_coverage: 85.50
-        # TODO: this is a bit broken - fix and submit PR upstream
-        run: |
-          value=$(jq '.percent_covered' <coverage/bats/coverage.json)
-          expected="$minimum_coverage"
-          fixed_point() { # <float val>
-            int=${value%.*}
-            decimals=${value#*.}
-            echo -n "${int}${decimals}"
-          }
-          echo "Coverage: $value%" | tee "$GITHUB_STEP_SUMMARY"
-          if (( $(fixed_point $value) < $(fixed_point $expected) )); then
-            echo "  is below required minimum coverage ($minimum_coverage%)." | tee -a "$GITHUB_STEP_SUMMARY"
-            exit 1
-          fi            
+        run: test/check_coverage.sh
